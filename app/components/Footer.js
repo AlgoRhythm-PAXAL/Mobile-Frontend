@@ -4,6 +4,9 @@ import { Ionicons } from 'react-native-vector-icons';
 import { useNavigationState } from '@react-navigation/native';
 import styles from '../styles/FooterStyles';
 import { DriverContext } from '../context/DriverContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import API_BASE_URL from '../../config';
 
 const Footer = ({ navigation, driverDetails}) => {
   // Get the active screen using useNavigationState
@@ -14,9 +17,29 @@ const Footer = ({ navigation, driverDetails}) => {
   // Helper function to determine if a route is active
   const isActive = (routeName) => activeRoute === routeName ? styles.activeFooterButton : null;
 
-  const handleLogout = () => {
-    setDriverDetails(null); // Clear driver details
-    navigation.navigate('Login'); // Redirect to Login page
+  const handleLogout = async () => {
+    try {
+      // Retrieve the token (if needed for the logout API call)
+      const token = await AsyncStorage.getItem('token');
+  
+      // Call the logout API (optional)
+      await axios.post(`${API_BASE_URL}/api/mobile/driver/logout`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDriverDetails(null);
+     
+      await AsyncStorage.removeItem('token');
+
+      
+      // Redirect to the Login page
+      navigation.navigate('Login');
+      console.log('Logout successful');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Alert.alert('Error', 'Failed to log out. Please try again.');
+    }
   };
 
   return (

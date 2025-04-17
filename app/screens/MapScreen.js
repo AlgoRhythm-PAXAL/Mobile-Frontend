@@ -1,14 +1,19 @@
 
 // MapScreen.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState ,useContext} from 'react';
 import { View, Alert, Text } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import styles from '../styles/MapScreenStyles';
+import { TouchableOpacity, } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { DriverContext } from '../context/DriverContext';
 
 const MapScreen = ({ route }) => {
   const { address } = route.params || {};
+  const navigation = useNavigation();
+  const { driverDetails } = useContext(DriverContext);
 
   // Default location (Sri Lanka)
   const defaultLocation = {
@@ -21,6 +26,7 @@ const MapScreen = ({ route }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [locationWatcher, setLocationWatcher] = useState(null);
 
   useEffect(() => {
     requestLocationPermission();
@@ -69,7 +75,7 @@ const MapScreen = ({ route }) => {
   };
 
   const startLocationTracking = async () => {
-    Location.watchPositionAsync(
+    const watcher = Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 5000, // Update every 5 seconds
@@ -92,7 +98,16 @@ const MapScreen = ({ route }) => {
         });
       }
     );
+    setCurrentLocation(watcher);
   };
+
+  const stopLocationTracking = () => {
+    if (locationWatcher) {
+      locationWatcher.remove(); // Stop location tracking
+      console.log('Location tracking stopped');
+    }
+  };
+
 
   const geocodeAddress = async (address) => {
     try {
@@ -146,6 +161,8 @@ const MapScreen = ({ route }) => {
     }
   };
 
+
+  
   const updateRoute = async (newLocation) => {
     if (destination) {
       await fetchRoute(newLocation, destination);
@@ -180,7 +197,23 @@ const MapScreen = ({ route }) => {
       ) : (
         <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading Map...</Text>
       )}
+
+
+     {/* Exit Button positioned at the bottom */}
+     <View style={styles.exitButtonContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            stopLocationTracking();
+            navigation.navigate('Home', { driverDetails: driverDetails })
+          }}
+          style={styles.exitButton}
+        >
+          <Text style={styles.exitButtonText}>Exit Navigation</Text>
+        </TouchableOpacity>
+      </View>
     </View>
+ 
+ 
   );
 };
 

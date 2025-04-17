@@ -14,6 +14,7 @@ import styles from '../styles/LoginScreenStyles';
 import { useNavigation } from '@react-navigation/native';
 import API_BASE_URL from '../../config';
 import { DriverContext } from '../context/DriverContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -28,39 +29,45 @@ const LoginScreen = () => {
     Poppins_700Bold,
   });
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/mobile/driver/login`, {
-        email,
-        password,
-      });
+  
+const handleLogin = async () => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/mobile/driver/login`, {
+      email: email.trim(),
+      password: password.trim(),
+    });
 
-      if (response.status === 200) {
-        console.log("Driver ID:", response.data.driverId);
+    if (response.data.success) {
+      const { token, driver } = response.data;
 
-        // Fetch driver details
-        const driverResponse = await axios.get(`${API_BASE_URL}/api/mobile/driver/email/${email}`);
-        const driverDetails = driverResponse.data;
+      // Save token to AsyncStorage
+      await AsyncStorage.setItem('token', token);
+      console.log("Token saved:");
+      //console.log("Token saved:", token)
+      
+      // Save driver details in context
+      setDriverDetails(driver);
+      console.log("Login successful");
 
-        // Save driver details in state
-        setDriverDetails(driverDetails);
-
-        // Navigate to the home screen with the driver's details 
-        navigation.navigate('Home', { driverDetails });
-      }
-    } catch (error) {
-      console.error("Login Error:", error);
-      Alert.alert('Login Error', 'Invalid email or password');
+      // Navigate to home screen
+      navigation.navigate('Home', { driverDetails: driver });
+      
+    } else {
+      Alert.alert('Login Failed', response.data.message || 'Invalid credentials');
     }
-  };
-
-  if (!fontsLoaded) {
-    return null; // Wait for font to load
+  } catch (error) {
+    console.error("Login Error:", error);
+    Alert.alert('Login Error', 'Something went wrong. Please try again.');
   }
+};
+
+const checkToken = async () => {
+  const token = await AsyncStorage.getItem('token');
+  console.log('Stored Token:', token);
+};
 
   return (
     <View style={styles.container}>
-      {/* Static Header & Logo (Does Not Move) */}
       <Animatable.View animation="fadeIn" duration={1500} style={styles.header}>
         <Image 
           source={require('../../assets/paxallogo.png')} 

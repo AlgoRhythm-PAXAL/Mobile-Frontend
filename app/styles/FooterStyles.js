@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     footerText: {
-        fontSize: 16,
+        fontSize: 14,
         color: '#fff',
     },
     activeFooterButton: {

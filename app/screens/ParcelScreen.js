@@ -5,6 +5,7 @@ import styles from '../styles/ParcelScreenStyles';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Footer from '../components/Footer';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createMaterialTopTabNavigator();
 
