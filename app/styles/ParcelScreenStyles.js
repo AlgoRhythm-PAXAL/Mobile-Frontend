@@ -12,13 +12,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: '#fff',
     alignItems: 'flex-start',
-    justifyContent:'flex-start' ,
+    justifyContent: 'flex-start',
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   dropdownContainer: {
     width: 50,
@@ -28,12 +27,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 15,
     top: 40,
-   
   },
   picker: {
     height: 60,
     width: '100%',
- 
   },
 
   scrollContainer: {

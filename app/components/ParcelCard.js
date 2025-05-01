@@ -2,7 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import styles from '../styles/ParcelCardStyles'; // Import styles
 
-const ParcelCard = ({ parcelId, trackingNo, receiverName, receiverAddress }) => {
+const ParcelCard = ({
+  parcelId,
+  trackingNo,
+  receiverName,
+  receiverAddress,
+}) => {
   return (
     <View style={styles.parcelCard}>
       {/* Parcel Information */}

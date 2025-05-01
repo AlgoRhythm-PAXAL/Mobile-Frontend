@@ -32,32 +32,67 @@ const ParcelCard = ({ parcelId, customerName, trackingNo, address }) => (
 );
 
 const PickupTab = () => (
-  
   <ScrollView contentContainerStyle={styles.scrollContainer}>
-    
-    <ParcelCard parcelId="PARCEL001" customerName="John Doe" trackingNo="TRK001" address="123 Main Street" isPickup={true} />
-    <ParcelCard parcelId="67890" customerName="Jane Smith" trackingNo="TRK002" address="456 Elm Avenue" isPickup={true} />
+    <ParcelCard
+      parcelId="PARCEL001"
+      customerName="John Doe"
+      trackingNo="TRK001"
+      address="123 Main Street"
+      isPickup={true}
+    />
+    <ParcelCard
+      parcelId="67890"
+      customerName="Jane Smith"
+      trackingNo="TRK002"
+      address="456 Elm Avenue"
+      isPickup={true}
+    />
   </ScrollView>
 );
 
 const DeliverTab = () => (
   <ScrollView contentContainerStyle={styles.scrollContainer}>
-    <ParcelCard parcelId="PARCEL001" customerName="John Doe" trackingNo="TRK001" address="123 Main Street" isPickup={false} />
-    <ParcelCard parcelId="67890" customerName="Jane Smith" trackingNo="TRK002" address="456 Elm Avenue" isPickup={false} />
+    <ParcelCard
+      parcelId="PARCEL001"
+      customerName="John Doe"
+      trackingNo="TRK001"
+      address="123 Main Street"
+      isPickup={false}
+    />
+    <ParcelCard
+      parcelId="67890"
+      customerName="Jane Smith"
+      trackingNo="TRK002"
+      address="456 Elm Avenue"
+      isPickup={false}
+    />
   </ScrollView>
 );
 
 const PendingTab = () => (
   <ScrollView contentContainerStyle={styles.scrollContainer}>
-  
-    <ParcelCard parcelId="12345" customerName="John Doe" trackingNo="TRK001" address="123 Main Street" isPickup={false} />
-    <ParcelCard parcelId="67890" customerName="Jane Smith" trackingNo="TRK002" address="456 Elm Avenue" isPickup={false} />
+    <ParcelCard
+      parcelId="12345"
+      customerName="John Doe"
+      trackingNo="TRK001"
+      address="123 Main Street"
+      isPickup={false}
+    />
+    <ParcelCard
+      parcelId="67890"
+      customerName="Jane Smith"
+      trackingNo="TRK002"
+      address="456 Elm Avenue"
+      isPickup={false}
+    />
   </ScrollView>
 );
 
 const ParcelScreen = ({ route, navigation }) => {
   const [mode, setMode] = useState('pickup'); // State to track the selected mode
-  const [headerTitle, setHeaderTitle] = useState(mode === 'pickup' ? 'Pickups' : 'Deliveries');
+  const [headerTitle, setHeaderTitle] = useState(
+    mode === 'pickup' ? 'Pickups' : 'Deliveries'
+  );
 
   // Update header title when mode changes
   useEffect(() => {
@@ -68,7 +103,12 @@ const ParcelScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerText, { color: mode === 'pickup' ? 'black' : 'black' }]}>
+        <Text
+          style={[
+            styles.headerText,
+            { color: mode === 'pickup' ? 'black' : 'black' },
+          ]}
+        >
           {headerTitle}
         </Text>
 
@@ -79,7 +119,6 @@ const ParcelScreen = ({ route, navigation }) => {
             onValueChange={(itemValue) => setMode(itemValue)}
             style={styles.picker}
             dropdownIconColor="#000"
-           
           >
             <Picker.Item label="Pickups" value="pickup" />
             <Picker.Item label="Deliveries" value="deliver" />
@@ -117,6 +156,5 @@ const ParcelScreen = ({ route, navigation }) => {
     </View>
   );
 };
-
 
 export default ParcelScreen;

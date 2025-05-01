@@ -1,12 +1,11 @@
-
-// MapScreen.js
-import React, { useEffect, useState ,useContext} from 'react';
+//Mapscreen.js
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Alert, Text } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import styles from '../styles/MapScreenStyles';
-import { TouchableOpacity, } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DriverContext } from '../context/DriverContext';
 
@@ -15,7 +14,6 @@ const MapScreen = ({ route }) => {
   const navigation = useNavigation();
   const { driverDetails } = useContext(DriverContext);
 
-  // Default location (Sri Lanka)
   const defaultLocation = {
     latitude: 6.7745227,
     longitude: 79.882978,
@@ -33,6 +31,11 @@ const MapScreen = ({ route }) => {
     if (address) {
       geocodeAddress(address);
     }
+
+
+    return () => {
+      stopLocationTracking(); //stop tracking
+    };
   }, [address]);
 
   const requestLocationPermission = async () => {
@@ -61,13 +64,6 @@ const MapScreen = ({ route }) => {
       };
       setCurrentLocation(userLocation);
       setRouteCoordinates([userLocation]);
-
-      // Log the source location (initial current location)
-      console.log('Source Location:', {
-        
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-      });
     } catch (error) {
       console.warn('Error getting location:', error);
       Alert.alert('Error', 'Ensure location services are enabled.');
@@ -75,11 +71,11 @@ const MapScreen = ({ route }) => {
   };
 
   const startLocationTracking = async () => {
-    const watcher = Location.watchPositionAsync(
+    const watcher = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 5000, // Update every 5 seconds
-        distanceInterval: 10, // Update every 10 meters
+        timeInterval: 30000,
+        distanceInterval: 100,
       },
       (location) => {
         const newLocation = {
@@ -90,70 +86,66 @@ const MapScreen = ({ route }) => {
         };
         setCurrentLocation(newLocation);
         updateRoute(newLocation);
-
-        // Log the driver's location at each 10 meters
         console.log('Driver Location (every 10m):', {
           latitude: newLocation.latitude,
           longitude: newLocation.longitude,
         });
       }
     );
-    setCurrentLocation(watcher);
+    setLocationWatcher(watcher); // Store the watcher reference
   };
 
   const stopLocationTracking = () => {
-    if (locationWatcher) {
+    if (locationWatcher && typeof locationWatcher.remove === 'function') {
       locationWatcher.remove(); // Stop location tracking
+      setLocationWatcher(null); // Clear the watcher
       console.log('Location tracking stopped');
     }
   };
 
-
   const geocodeAddress = async (address) => {
     try {
-        console.log("Geocoding Address:", address);
-
-        const response = await axios.get(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
-            {
-                headers: {
-                    "User-Agent": "mobile_app"
-                }
-            }
-        );
-
-        console.log("Geocoding Response:", response.data);
-
-        if (response.data.length > 0) {
-            const location = response.data[0];
-            const destinationLocation = {
-                latitude: parseFloat(location.lat),
-                longitude: parseFloat(location.lon),
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-            };
-            setDestination(destinationLocation);
-
-            console.log("Destination Location:", destinationLocation);
-        } else {
-            Alert.alert("Error", "Location not found.");
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
+        {
+          //A custom User-Agent header (to avoid being blocked)
+          headers: {
+            'User-Agent': 'mobile_app',
+          },
         }
+      );
+      if (response.data.length > 0) {
+        const location = response.data[0];
+        const destinationLocation = {
+          latitude: parseFloat(location.lat),
+          longitude: parseFloat(location.lon),
+          latitudeDelta: 0.01, //control the zoom level of the map
+          longitudeDelta: 0.01,
+        };
+        setDestination(destinationLocation);
+      } else {
+        Alert.alert('Error', 'Location not found.');
+      }
     } catch (error) {
-        console.error("Geocoding Error:", error.message);
-        Alert.alert("Error", "Failed to fetch geocode data. Check internet & API availability.");
+      console.error('Geocoding Error:', error.message);
+      Alert.alert(
+        'Error',
+        'Failed to fetch geocode data. Check internet & API availability.'
+      );
     }
-};
-
+  };
 
   const fetchRoute = async (origin, destination) => {
     try {
       const response = await axios.get(
         `https://router.project-osrm.org/route/v1/driving/${origin.longitude},${origin.latitude};${destination.longitude},${destination.latitude}?overview=full&geometries=geojson`
       );
-      const coordinates = response.data.routes[0].geometry.coordinates.map((coord) => ({
-        latitude: coord[1],
-        longitude: coord[0],
-      }));
+      const coordinates = response.data.routes[0].geometry.coordinates.map(
+        (coord) => ({
+          latitude: coord[1],
+          longitude: coord[0],
+        })
+      );
       setRouteCoordinates(coordinates);
     } catch (error) {
       console.error('Error fetching route:', error);
@@ -161,8 +153,6 @@ const MapScreen = ({ route }) => {
     }
   };
 
-
-  
   const updateRoute = async (newLocation) => {
     if (destination) {
       await fetchRoute(newLocation, destination);
@@ -183,9 +173,20 @@ const MapScreen = ({ route }) => {
           initialRegion={currentLocation || defaultLocation}
           showsUserLocation={true}
         >
-          {currentLocation && <Marker coordinate={currentLocation} title="Your Location" pinColor="blue" />}
-          {destination && <Marker coordinate={destination} title="Destination" pinColor="red" />}
-
+          {currentLocation && (
+            <Marker
+              coordinate={currentLocation}
+              title="Your Location"
+              pinColor="blue"
+            />
+          )}
+          {destination && (
+            <Marker
+              coordinate={destination}
+              title="Destination"
+              pinColor="red"
+            />
+          )}
           {routeCoordinates.length > 1 && (
             <Polyline
               coordinates={routeCoordinates}
@@ -195,16 +196,16 @@ const MapScreen = ({ route }) => {
           )}
         </MapView>
       ) : (
-        <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading Map...</Text>
+        <Text style={{ textAlign: 'center', marginTop: 20 }}>
+          Loading Map...
+        </Text>
       )}
 
-
-     {/* Exit Button positioned at the bottom */}
-     <View style={styles.exitButtonContainer}>
+      <View style={styles.exitButtonContainer}>
         <TouchableOpacity
           onPress={() => {
-            stopLocationTracking();
-            navigation.navigate('Home', { driverDetails: driverDetails })
+            stopLocationTracking(); // Stop location tracking when exiting
+            navigation.navigate('Home', { driverDetails: driverDetails });
           }}
           style={styles.exitButton}
         >
@@ -212,8 +213,6 @@ const MapScreen = ({ route }) => {
         </TouchableOpacity>
       </View>
     </View>
- 
- 
   );
 };
 

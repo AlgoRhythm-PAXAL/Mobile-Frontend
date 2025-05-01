@@ -1,11 +1,20 @@
-
 //LoginScreen.js
-import React, { useState,useContext } from 'react';
-import { 
-  View, Text, TextInput, Pressable, Alert, Image, TouchableWithoutFeedback, Keyboard 
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Alert,
+  Image,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { useFonts } from 'expo-font';
-import { Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import {
+  Poppins_400Regular,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins';
 import * as Animatable from 'react-native-animatable';
 import LottieView from 'lottie-react-native';
 import axios from 'axios';
@@ -20,7 +29,6 @@ const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
-  //const [driverDetails, setDriverDetails] = useState(null);
   const { setDriverDetails } = useContext(DriverContext);
 
   // Load fonts
@@ -29,72 +37,77 @@ const LoginScreen = () => {
     Poppins_700Bold,
   });
 
-  
-const handleLogin = async () => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/api/mobile/driver/login`, {
-      email: email.trim(),
-      password: password.trim(),
-    });
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/mobile/driver/login`,
+        {
+          email: email.trim(),
+          password: password.trim(),
+        }
+      );
 
-    if (response.data.success) {
-      const { token, driver } = response.data;
+      if (response.data.success) {
+        const { token, driver } = response.data;
 
-      // Save token to AsyncStorage
-      await AsyncStorage.setItem('token', token);
-      console.log("Token saved:");
-      //console.log("Token saved:", token)
-      
-      // Save driver details in context
-      setDriverDetails(driver);
-      console.log("Login successful");
+        // Save token to AsyncStorage
+        await AsyncStorage.setItem('token', token);
+        console.log('Token saved:');
 
-      // Navigate to home screen
-      navigation.navigate('Home', { driverDetails: driver });
-      
-    } else {
-      Alert.alert('Login Failed', response.data.message || 'Invalid credentials');
+        // Save driver details in context
+        setDriverDetails(driver);
+        console.log('Login successful');
+
+        // Navigate to home screen
+        navigation.navigate('Home', { driverDetails: driver });
+      } else {
+        Alert.alert(
+          'Login Failed',
+          response.data.message || 'Invalid credentials'
+        );
+      }
+    } catch (error) {
+      console.error('Login Error:', error);
+      Alert.alert('Login Error', 'Something went wrong. Please try again.');
     }
-  } catch (error) {
-    console.error("Login Error:", error);
-    Alert.alert('Login Error', 'Something went wrong. Please try again.');
-  }
-};
+  };
 
-const checkToken = async () => {
-  const token = await AsyncStorage.getItem('token');
-  console.log('Stored Token:', token);
-};
+  const checkToken = async () => {
+    const token = await AsyncStorage.getItem('token');
+    console.log('Stored Token:', token);
+  };
 
   return (
     <View style={styles.container}>
       <Animatable.View animation="fadeIn" duration={1500} style={styles.header}>
-        <Image 
-          source={require('../../assets/paxallogo.png')} 
-          style={styles.logoImage} 
+        <Image
+          source={require('../../assets/paxallogo.png')}
+          style={styles.logoImage}
         />
       </Animatable.View>
 
-      {/* Lottie Animation (Remains Fixed) */}
       <View style={styles.lorryContainer}>
-        <LottieView 
-          source={require('../../assets/lorry-animation.json')} 
-          autoPlay 
-          loop 
+        <LottieView
+          source={require('../../assets/lorry-animation.json')}
+          autoPlay
+          loop
           style={styles.lorryAnimation}
         />
       </View>
 
-      {/* Keyboard-Aware Form */}
-      <KeyboardAwareScrollView 
+      <KeyboardAwareScrollView
         contentContainerStyle={styles.formContainer}
-        extraScrollHeight={50} // Moves up slightly when keyboard appears
-        enableOnAndroid={true} 
+        extraScrollHeight={50}
+        enableOnAndroid={true}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.welcomeContainer}>
             {/* Welcome Text */}
-            <Text style={[styles.welcomeText, { fontFamily: 'Poppins_700Bold' }]}>Welcome!</Text>
+            <Text
+              style={[styles.welcomeText, { fontFamily: 'Poppins_700Bold' }]}
+            >
+              Welcome!
+            </Text>
             <View style={styles.form}>
               <TextInput
                 style={[styles.input, { fontFamily: 'Poppins_400Regular' }]}
@@ -110,7 +123,14 @@ const checkToken = async () => {
                 onChangeText={setPassword}
               />
               <Pressable style={styles.button} onPress={handleLogin}>
-                <Text style={[styles.buttonText, { fontFamily: 'Poppins_400Regular' }]}>Login</Text>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { fontFamily: 'Poppins_400Regular' },
+                  ]}
+                >
+                  Login
+                </Text>
               </Pressable>
             </View>
           </View>

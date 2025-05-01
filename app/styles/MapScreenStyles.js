@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start', 
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   map: {
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30, // Position the button 30px from the bottom
     left: 0,
-    right:0,
+    right: 0,
     alignItems: 'center',
   },
   exitButton: {
