@@ -1,3 +1,4 @@
+
 // ProfileScreen.js
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
@@ -26,6 +27,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const { driverDetails, setDriverDetails } = useContext(DriverContext);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // State initialization
   const [driverName, setDriverName] = useState(driverDetails?.name || '');
@@ -40,13 +42,16 @@ const ProfileScreen = ({ navigation, route }) => {
     driverDetails?.profilePicture || null
   );
 
-  // Enhanced data fetching with local cache
+  // Enhanced data fetching with proper cache handling
   useFocusEffect(
     useCallback(() => {
       const fetchProfile = async () => {
         try {
           setLoading(true);
 
+          // First, check for cached profile picture
+          const cachedPic = await AsyncStorage.getItem('profilePictureCache');
+          
           const token = await AsyncStorage.getItem('token');
           const email =
             driverDetails?.email || (await AsyncStorage.getItem('driverEmail'));
@@ -57,26 +62,36 @@ const ProfileScreen = ({ navigation, route }) => {
             return;
           }
 
-          const response = await axios.get(
-            `${API_BASE_URL}/api/mobile/driver/email/${email}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-
-          const details = response.data;
-          console.log('Fetched profile data:', details);
-
-          setDriverDetails(details);
-          setDriverName(details.name || '');
-          setDriverEmail(details.email || '');
-          setContactNumbers(details.contactNo || []);
-          setVehicleNumber(details.licenseId || '');
-
-          if (!cachedPic && details.profilePicture) {
-            setProfilePicture(details.profilePicture);
-            await AsyncStorage.setItem(
-              'profilePictureCache',
-              details.profilePicture
+          // Only fetch from backend if we don't have unsaved changes
+          if (!hasUnsavedChanges) {
+            const response = await axios.get(
+              `${API_BASE_URL}/api/mobile/driver/email/${email}`,
+              { headers: { Authorization: `Bearer ${token}` } }
             );
+
+            const details = response.data;
+            console.log('Fetched profile data:', details);
+
+            setDriverDetails(details);
+            setDriverName(details.name || '');
+            setDriverEmail(details.email || '');
+            setContactNumbers(details.contactNo || []);
+            setVehicleNumber(details.licenseId || '');
+
+            // Use cached picture if available, otherwise use backend data
+            if (cachedPic) {
+              setProfilePicture(cachedPic);
+              console.log('Using cached profile picture');
+            } else if (details.profilePicture) {
+              setProfilePicture(details.profilePicture);
+              await AsyncStorage.setItem('profilePictureCache', details.profilePicture);
+            }
+          } else {
+            // If we have unsaved changes, just use cached data
+            if (cachedPic) {
+              setProfilePicture(cachedPic);
+              console.log('Using cached profile picture (unsaved changes)');
+            }
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
@@ -84,19 +99,10 @@ const ProfileScreen = ({ navigation, route }) => {
         } finally {
           setLoading(false);
         }
-
-        // Check local cache 
-        const cachedPic = await AsyncStorage.getItem('profilePictureCache');
-        if (cachedPic) {
-          setProfilePicture(cachedPic);
-          console.log('Loaded profile picture from cache');
-
-          console.log('Base64 prefix:', cachedPic?.substring(0, 100)); // logs only first 100 chars
-        }
       };
 
       fetchProfile();
-    }, [driverDetails?.email, setDriverDetails])
+    }, [driverDetails?.email, setDriverDetails, hasUnsavedChanges])
   );
 
   // Request permissions for Android
@@ -161,6 +167,7 @@ const ProfileScreen = ({ navigation, route }) => {
           profilePicture: fullBase64,
         }));
         await AsyncStorage.setItem('profilePictureCache', fullBase64);
+        setHasUnsavedChanges(true); // Mark as having unsaved changes
 
         console.log('New profile picture set and cached');
       }
@@ -181,29 +188,27 @@ const ProfileScreen = ({ navigation, route }) => {
       setSaving(true);
       const token = await AsyncStorage.getItem('token');
 
-      // Immediately use the updated profile picture
-      const updatedPicture = profilePicture;
-   
       const response = await axios.put(
         `${API_BASE_URL}/api/mobile/drivers/${driverDetails.email}/profilepicture`,
-        { profilePicture: updatedPicture },
+        { profilePicture: profilePicture },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       console.log('Backend response:', response.data);
 
       if (response.data) {
-        // Save the updated picture in AsyncStorage and context
-        await AsyncStorage.setItem('profilePictureCache', updatedPicture);
-        await AsyncStorage.setItem('profilePicture', updatedPicture);
+        // Clear the unsaved changes flag
+        setHasUnsavedChanges(false);
+        
+        // Update all storage locations
+        await AsyncStorage.setItem('profilePictureCache', profilePicture);
+        await AsyncStorage.setItem('profilePicture', profilePicture);
 
+        // Update context with the saved profile picture
         setDriverDetails((prev) => ({
           ...prev,
-          profilePicture: updatedPicture,
+          profilePicture: profilePicture,
         }));
-
-        // Update local state with the saved profile picture
-        setProfilePicture(updatedPicture);
 
         Alert.alert('Success', 'Profile picture updated successfully');
       }
@@ -316,14 +321,19 @@ const ProfileScreen = ({ navigation, route }) => {
 
         {/* Save Button */}
         <TouchableOpacity
-          style={styles.saveButton}
+          style={[
+            styles.saveButton,
+            hasUnsavedChanges && styles.saveButtonHighlight // Optional: highlight when changes exist
+          ]}
           onPress={handleSaveChanges}
           disabled={saving}
         >
           {saving ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.saveButtonText}>Save Changes</Text>
+            <Text style={styles.saveButtonText}>
+              {hasUnsavedChanges ? 'Save Changes' : 'No Changes'}
+            </Text>
           )}
         </TouchableOpacity>
       </ScrollView>

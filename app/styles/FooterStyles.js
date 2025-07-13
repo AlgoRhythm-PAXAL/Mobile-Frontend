@@ -2,6 +2,12 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    height: 60,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     backgroundColor: '#1F818C',

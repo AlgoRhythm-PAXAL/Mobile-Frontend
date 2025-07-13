@@ -9,7 +9,11 @@ import ProfileScreen from './screens/ProfileScreen';
 import ParcelScreen from './screens/ParcelScreen';
 import MapScreen from './screens/MapScreen';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity,KeyboardAvoidingView,Platform,View } from 'react-native';
+import { Footer } from './components/Footer';
+
+
+
 
 const Stack = createStackNavigator();
 
@@ -58,6 +62,7 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     </DriverProvider>
+    
   );
 };
 

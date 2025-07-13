@@ -10,6 +10,7 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
+  Linking
 } from 'react-native';
 import styles from '../styles/HomeScreenStyles';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -33,7 +34,6 @@ const StatusCard = ({ title, count }) => (
 );
 
 //Parcelcard
-
 const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
   console.log('Rendering ParcelCard with:', {
     parcelId: parcel.parcelId,
@@ -268,11 +268,20 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
           <Text style={styles.infoText}>{trackingNo}</Text>
         </View>
 
-        <View style={styles.infoRow}>
+       <View style={styles.infoRow}>
           <MaterialIcons name="phone" size={18} color="#555" />
-          <Text style={styles.infoText}>
+          <Text style={[styles.infoText, { flex: 1 }]}>
             {customerInfo.phone || 'No phone'}
           </Text>
+          {customerInfo.phone ? (
+            <TouchableOpacity
+              onPress={() => Linking.openURL(`tel:${customerInfo.phone}`)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={{ paddingLeft: 10 }}
+            >
+              <MaterialIcons name="call" size={22} color="#555" />
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         <View style={styles.infoRow}>
