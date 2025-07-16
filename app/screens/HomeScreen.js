@@ -22,6 +22,10 @@ import { DriverContext } from '../context/DriverContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -87,6 +91,7 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
   const [amount, setAmount] = useState('');
   const [isPressed, setIsPressed] = useState(false);
   const [parcels, setParcels] = useState([]);
+ 
 
   const handleStatusUpdate = async () => {
     try {
@@ -155,15 +160,15 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
   };
 
   const confirmPayment = () => {
-    if (!amount || parseFloat(amount) < amountToBePaid) {
-      Alert.alert(
-        'Invalid Amount',
-        `Please enter at least LKR ${amountToBePaid}`
-      );
-      return;
-    }
+    // if (!amount || parseFloat(amount) < amountToBePaid) {
+    //   Alert.alert(
+    //     'Invalid Amount',
+    //     `Please enter at least LKR ${amountToBePaid}`
+    //   );
+    //   return;
+    // }
 
-    setIsPaid(true);
+    // setIsPaid(true);
 
     // Show confirmation dialog
     Alert.alert(
@@ -363,25 +368,26 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
               Amount Due: LKR {amountToBePaid}
             </Text>
 
-            <TextInput
+            {/* <TextInput
               style={styles.paymentInput}
               placeholder={`Enter collected amount (min LKR ${amountToBePaid})`}
               keyboardType="numeric"
               value={amount}
               onChangeText={setAmount}
-            />
+            /> */}
 
             <View style={styles.modalButtonContainer}>
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => setShowPaymentModal(false)}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                 <Text style={styles.buttonText}>Cancel</Text> 
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.confirmButton}
                 onPress={confirmPayment}
               >
+              
                 <Text style={styles.buttonText}>Confirm</Text>
               </TouchableOpacity>
             </View>
@@ -575,6 +581,8 @@ const HomeScreen = ({ navigation, route }) => {
   const [eveningParcels, setEveningParcels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
+   
+  const insets = useSafeAreaInsets();
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([
@@ -737,52 +745,52 @@ const HomeScreen = ({ navigation, route }) => {
       </View>
 
       {/* Notification Modal */}
-      <Modal
-        visible={showNotifications}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={toggleNotifications}
-        onShow={() => {
-          // Mark all notifications as read when modal opens
-          setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-          setUnreadCount(0);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Parcel Summary</Text>
-              <TouchableOpacity onPress={toggleNotifications}>
-                <MaterialIcons name="close" size={24} color="#1F818C" />
-              </TouchableOpacity>
-            </View>
+    
 
-            <View style={styles.notificationItem}>
-              <Text style={styles.notificationTitle}>
-                <MaterialIcons
-                  name="local-shipping"
-                  size={18}
-                  color="#1F818C"
-                />{' '}
-                Parcels to Pick Up
-              </Text>
-              <Text style={styles.notificationMessage}>
-                You have {parcelCounts.pickup} parcels waiting for pickup
-              </Text>
-            </View>
+        <Modal
+          visible={showNotifications}
+          animationType="slide"
+          statusBarTranslucent={true}
+          transparent={true}
+          onRequestClose={toggleNotifications}
+          onShow={() => {
+            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+            setUnreadCount(0);
+          }}
+        >
+          <View style={[styles.modalContainer]}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Parcel Summary</Text>
+                <TouchableOpacity onPress={toggleNotifications}>
+                  <MaterialIcons name="close" size={24} color="#1F818C" />
+                </TouchableOpacity>
+              </View>
 
-            <View style={styles.notificationItem}>
-              <Text style={styles.notificationTitle}>
-                <MaterialIcons name="check-circle" size={18} color="#4CAF50" />{' '}
-                Parcels to Deliver
-              </Text>
-              <Text style={styles.notificationMessage}>
-                You have {parcelCounts.delivery} parcels ready for delivery
-              </Text>
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationTitle}>
+                  <MaterialIcons name="local-shipping" size={18} color="#1F818C" />{' '}
+                  Parcels to Pick Up
+                </Text>
+                <Text style={styles.notificationMessage}>
+                  You have {parcelCounts.pickup} parcels waiting for pickup
+                </Text>
+              </View>
+
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationTitle}>
+                  <MaterialIcons name="check-circle" size={18} color="#4CAF50" />{' '}
+                  Parcels to Deliver
+                </Text>
+                <Text style={styles.notificationMessage}>
+                  You have {parcelCounts.delivery} parcels ready for delivery
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+
+
 
       <Tab.Navigator
         initialRouteName="Pickup"

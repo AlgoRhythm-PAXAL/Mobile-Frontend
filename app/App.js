@@ -11,6 +11,7 @@ import MapScreen from './screens/MapScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity,KeyboardAvoidingView,Platform,View } from 'react-native';
 import { Footer } from './components/Footer';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 
 
@@ -20,6 +21,7 @@ const Stack = createStackNavigator();
 const App = () => {
   return (
     <DriverProvider>
+       <SafeAreaProvider>
       <NavigationContainer>
         <StatusBar style="auto" />
         <Stack.Navigator initialRouteName="Login">
@@ -61,6 +63,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      </SafeAreaProvider>
     </DriverProvider>
     
   );

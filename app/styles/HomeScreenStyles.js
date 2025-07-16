@@ -1,6 +1,7 @@
 //HomeScreenStyles.js
 
 import { StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 
 // Color Constants (defined first for easy maintenance)
 const Colors = {
@@ -26,6 +27,7 @@ const Colors = {
 
 const styles = StyleSheet.create({
   container: {
+    padding: 0,
     flex: 1,
     backgroundColor: Colors.background,
   },
@@ -251,7 +253,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   modalText: {
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textSecondary,
     textAlign: 'center',
     marginBottom: 24,
@@ -411,11 +413,12 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  // Add this ONE style to your existing stylesheet:
+  
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    
   },
   modalContent: {
     backgroundColor: 'white',
@@ -423,12 +426,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     maxHeight: '60%',
+    paddingBottom: 30,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
+  
   },
   modalTitle: {
     fontSize: 20,
@@ -437,6 +442,7 @@ const styles = StyleSheet.create({
   },
   notificationItem: {
     padding: 15,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },

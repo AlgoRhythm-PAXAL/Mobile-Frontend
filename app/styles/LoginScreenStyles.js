@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   header: {
-    height: '33%', // Top 1/3 of the screen
+    height: '33%',
     backgroundColor: '#1F818C',
     justifyContent: 'center',
     alignItems: 'center',
@@ -53,25 +53,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    width: '50%', // Adjust the width for a smaller button
-    alignSelf: 'center', // Center the button horizontally
+    width: '50%', 
+    alignSelf: 'center', 
   },
   buttonText: {
     fontSize: 16,
-    color: 'white', // Default text color for the button
+    color: 'white', 
     textAlign: 'center',
   },
   lorryContainer: {
     width: '100%',
-    height: 300, // Adjust height to control the size of the animation
+    height: 300, 
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute', // Position it at the bottom of the screen
-    bottom: 0, // Make sure it stays at the bottom
+    position: 'absolute', 
+    bottom: 0, 
   },
   lorryAnimation: {
-    width: 600, // Adjust width to control the size of the animation
-    height: 300, // Adjust height accordingly
+    width: 600, 
+    height: 300, 
   },
 
   logoImage: {

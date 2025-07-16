@@ -30,7 +30,9 @@
         {
           "photosPermission": "Allow this app to access your photos."
         }
-      ]
+      ],
+      "expo-font",
+      "expo-secure-store"
     ]
   }
 }

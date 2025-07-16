@@ -123,6 +123,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  saveButtonHighlight: {
+  backgroundColor: '#1F818C', // active blue
+},
+
+  saveButtonDisabled: {
+  backgroundColor: '#ccc', // grey when disabled
+},
 });
 
 export default styles;

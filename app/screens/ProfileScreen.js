@@ -321,18 +321,19 @@ const ProfileScreen = ({ navigation, route }) => {
 
         {/* Save Button */}
         <TouchableOpacity
-          style={[
-            styles.saveButton,
-            hasUnsavedChanges && styles.saveButtonHighlight // Optional: highlight when changes exist
-          ]}
-          onPress={handleSaveChanges}
-          disabled={saving}
-        >
+            style={[
+              styles.saveButton,
+              hasUnsavedChanges ? styles.saveButtonHighlight : styles.saveButtonDisabled
+            ]}
+            onPress={handleSaveChanges}
+            disabled={!hasUnsavedChanges || saving}
+      >
+
           {saving ? (
             <ActivityIndicator color="white" />
           ) : (
             <Text style={styles.saveButtonText}>
-              {hasUnsavedChanges ? 'Save Changes' : 'No Changes'}
+              {hasUnsavedChanges ? 'Save Changes' : 'Save Changes'}
             </Text>
           )}
         </TouchableOpacity>

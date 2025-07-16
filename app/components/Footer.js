@@ -7,8 +7,13 @@ import { DriverContext } from '../context/DriverContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import API_BASE_URL from '../../config';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
 
 const Footer = ({ navigation, driverDetails }) => {
+
+  const insets = useSafeAreaInsets();
   const activeRoute = useNavigationState(
     (state) => state?.routes[state?.index]?.name
   );

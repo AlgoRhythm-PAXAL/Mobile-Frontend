@@ -199,7 +199,9 @@ const ParcelScreen = ({ navigation }) => {
         <View style={styles.infoRow}>
           <MaterialIcons name="access-time" size={18} color="#1F818C" />
           <Text style={styles.infoText}>
-            {new Date(item.deliveredAt).toLocaleDateString('en-US', {
+            {new Date(
+              activeTab === 'deliveries' ? item.deliveredAt : item.pickedUpAt
+            ).toLocaleDateString('en-US', {
               weekday: 'short',
               month: 'short',
               day: 'numeric',
@@ -207,6 +209,7 @@ const ParcelScreen = ({ navigation }) => {
               minute: '2-digit',
             })}
           </Text>
+
         </View>
       </View>
 
