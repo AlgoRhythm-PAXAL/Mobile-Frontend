@@ -160,16 +160,7 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
   };
 
   const confirmPayment = () => {
-    // if (!amount || parseFloat(amount) < amountToBePaid) {
-    //   Alert.alert(
-    //     'Invalid Amount',
-    //     `Please enter at least LKR ${amountToBePaid}`
-    //   );
-    //   return;
-    // }
-
-    // setIsPaid(true);
-
+   
     // Show confirmation dialog
     Alert.alert(
       'Confirm Payment',
