@@ -653,12 +653,12 @@ const HomeScreen = ({ navigation, route }) => {
       setEveningParcels(evening);
 
       // Calculate counts AFTER setting state
-      const pickupCount = morning.filter(
-        (p) => p.status === 'PendingPickup'
-      ).length;
-      const deliveryCount = evening.filter(
-        (p) => p.status === 'DeliveryDispatched'
-      ).length;
+      const pickupCount = 
+          morning.filter((p) => p.status === 'PendingPickup').length +
+          evening.filter((p) => p.status === 'PendingPickup').length;
+      const deliveryCount = 
+          morning.filter((p) => p.status === 'DeliveryDispatched').length +
+          evening.filter((p) => p.status === 'DeliveryDispatched').length;
 
       setParcelCounts({
         pickup: pickupCount,
