@@ -75,13 +75,16 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
       };
 
   const address = isPickup
-    ? parcel.pickupInformation?.address || parcel.address
-    : parcel.deliveryInformation?.deliveryAddress || parcel.address;
+  ? parcel.pickupInformation?.address || parcel.address
+  : [parcel.deliveryInformation?.deliveryAddress || parcel.address, parcel.deliveryInformation?.deliveryCity]
+      .filter(Boolean)
+      .join(', ');
 
   const paymentData = parcel.paymentId || parcel.payment || {};
   const paymentMethod = (
     paymentData.paymentMethod || (isPickup ? 'Online' : 'COD')
   ).toUpperCase();
+
 
   const amountToBePaid = Number(paymentData.amount || 0);
 

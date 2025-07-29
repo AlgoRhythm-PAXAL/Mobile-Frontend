@@ -1,4 +1,3 @@
-
 // ProfileScreen.js
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
@@ -36,7 +35,7 @@ const ProfileScreen = ({ navigation, route }) => {
     driverDetails?.contactNo || []
   );
   const [vehicleNumber, setVehicleNumber] = useState(
-    driverDetails?.licenseId || ''
+    driverDetails?.registrationNo || ''
   );
   const [profilePicture, setProfilePicture] = useState(
     driverDetails?.profilePicture || null
@@ -51,7 +50,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
           // First, check for cached profile picture
           const cachedPic = await AsyncStorage.getItem('profilePictureCache');
-          
+
           const token = await AsyncStorage.getItem('token');
           const email =
             driverDetails?.email || (await AsyncStorage.getItem('driverEmail'));
@@ -76,7 +75,7 @@ const ProfileScreen = ({ navigation, route }) => {
             setDriverName(details.name || '');
             setDriverEmail(details.email || '');
             setContactNumbers(details.contactNo || []);
-            setVehicleNumber(details.licenseId || '');
+            setVehicleNumber(details.registrationNo || '');
 
             // Use cached picture if available, otherwise use backend data
             if (cachedPic) {
@@ -84,7 +83,10 @@ const ProfileScreen = ({ navigation, route }) => {
               console.log('Using cached profile picture');
             } else if (details.profilePicture) {
               setProfilePicture(details.profilePicture);
-              await AsyncStorage.setItem('profilePictureCache', details.profilePicture);
+              await AsyncStorage.setItem(
+                'profilePictureCache',
+                details.profilePicture
+              );
             }
           } else {
             // If we have unsaved changes, just use cached data
@@ -199,7 +201,7 @@ const ProfileScreen = ({ navigation, route }) => {
       if (response.data) {
         // Clear the unsaved changes flag
         setHasUnsavedChanges(false);
-        
+
         // Update all storage locations
         await AsyncStorage.setItem('profilePictureCache', profilePicture);
         await AsyncStorage.setItem('profilePicture', profilePicture);
@@ -321,14 +323,15 @@ const ProfileScreen = ({ navigation, route }) => {
 
         {/* Save Button */}
         <TouchableOpacity
-            style={[
-              styles.saveButton,
-              hasUnsavedChanges ? styles.saveButtonHighlight : styles.saveButtonDisabled
-            ]}
-            onPress={handleSaveChanges}
-            disabled={!hasUnsavedChanges || saving}
-      >
-
+          style={[
+            styles.saveButton,
+            hasUnsavedChanges
+              ? styles.saveButtonHighlight
+              : styles.saveButtonDisabled,
+          ]}
+          onPress={handleSaveChanges}
+          disabled={!hasUnsavedChanges || saving}
+        >
           {saving ? (
             <ActivityIndicator color="white" />
           ) : (

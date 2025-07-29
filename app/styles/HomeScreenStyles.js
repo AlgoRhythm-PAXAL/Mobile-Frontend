@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   confirmButton: {
-    backgroundColor: Colors.primary, // Your teal color
+    backgroundColor: Colors.delivery, 
     shadowColor: Colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 34,
@@ -330,6 +330,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     color: Colors.white,
+    
   },
 
   loadingContainer: {
