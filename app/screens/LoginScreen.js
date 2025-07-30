@@ -68,7 +68,11 @@ const LoginScreen = () => {
       }
     } catch (error) {
       console.error('Login Error:', error);
-      Alert.alert('Login Error', 'Something went wrong. Please try again.');
+      const backendMsg = error.response?.data?.message;
+      Alert.alert(
+        'Login Error',
+        backendMsg || 'Something went wrong. Please try again.'
+      );
     }
   };
 

@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   paymentModalContent: {
     width: '87%',
     backgroundColor: Colors.white,
-    borderRadius: 16,
+    borderRadius: 7,
     padding: 8,
     shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },

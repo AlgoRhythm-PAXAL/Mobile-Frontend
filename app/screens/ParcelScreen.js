@@ -274,7 +274,7 @@ const ParcelScreen = ({ navigation }) => {
             keyExtractor={(item) => item._id}
             renderItem={renderItem}
             scrollEnabled={true}
-            contentContainerStyle={{ paddingBottom: 80 }} // Adjusted for footer
+            contentContainerStyle={{ paddingBottom: 80 }} 
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}

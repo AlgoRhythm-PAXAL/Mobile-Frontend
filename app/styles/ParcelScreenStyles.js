@@ -58,13 +58,14 @@ const styles = StyleSheet.create({
   },
   quickFilterButtonActive: {
     backgroundColor: '#1F818C',
+    
   },
   quickFilterText: {
-    color: '#1F818C',
+    color: 'black',
     fontWeight: '500',
   },
   quickFilterTextActive: {
-    color: '#fff',
+    color: 'white',
     fontWeight: '500',
   },
   filterSection: {
