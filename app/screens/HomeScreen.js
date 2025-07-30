@@ -76,7 +76,7 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
 
   const address = isPickup
   ? parcel.pickupInformation?.address || parcel.address
-  : [parcel.deliveryInformation?.deliveryAddress || parcel.address, parcel.deliveryInformation?.deliveryCity]
+  : [parcel.deliveryInformation?.deliveryAddress , parcel.deliveryInformation?.deliveryCity || parcel.address]
       .filter(Boolean)
       .join(', ');
 
