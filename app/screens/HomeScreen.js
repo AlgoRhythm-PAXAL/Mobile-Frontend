@@ -10,7 +10,7 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
-  Linking
+  Linking,
 } from 'react-native';
 import styles from '../styles/HomeScreenStyles';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -24,8 +24,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -75,16 +73,13 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
       };
 
   const address = isPickup
-  ? parcel.pickupInformation?.address || parcel.address
-  : [parcel.deliveryInformation?.deliveryAddress , parcel.deliveryInformation?.deliveryCity || parcel.address]
-      .filter(Boolean)
-      .join(', ');
+    ? parcel.pickupInformation?.address || parcel.address
+    : parcel.deliveryInformation?.deliveryAddress || parcel.address;
 
   const paymentData = parcel.paymentId || parcel.payment || {};
   const paymentMethod = (
     paymentData.paymentMethod || (isPickup ? 'Online' : 'COD')
   ).toUpperCase();
-
 
   const amountToBePaid = Number(paymentData.amount || 0);
 
@@ -94,13 +89,11 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
   const [amount, setAmount] = useState('');
   const [isPressed, setIsPressed] = useState(false);
   const [parcels, setParcels] = useState([]);
- 
 
   const handleStatusUpdate = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
 
-      
       if (!isPickup && paymentMethod === 'COD' && !isPaid) {
         setShowPaymentModal(false);
         return;
@@ -114,7 +107,7 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
         parcelId,
         status: newStatus,
         paymentMethod,
-        isPaid: paymentMethod === 'COD' ? isPaid : true, 
+        isPaid: paymentMethod === 'COD' ? isPaid : true,
         amount:
           paymentMethod === 'COD' ? parseFloat(amount) || amountToBePaid : 0,
       };
@@ -163,7 +156,6 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
   };
 
   const confirmPayment = () => {
-   
     // Show confirmation dialog
     Alert.alert(
       'Confirm Payment',
@@ -267,7 +259,7 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
           <Text style={styles.infoText}>{trackingNo}</Text>
         </View>
 
-       <View style={styles.infoRow}>
+        <View style={styles.infoRow}>
           <MaterialIcons name="phone" size={18} color="#555" />
           <Text style={[styles.infoText, { flex: 1 }]}>
             {customerInfo.phone || 'No phone'}
@@ -329,7 +321,7 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
           ]}
           onPress={() => {
             if (!isPickup && paymentMethod === 'COD' && !isPaid) {
-              setShowPaymentModal(true); 
+              setShowPaymentModal(true);
             } else {
               showConfirmationDialog();
             }
@@ -375,13 +367,12 @@ const ParcelCard = ({ parcel, isPickup, navigation, refreshCounts }) => {
                 style={styles.cancelButton}
                 onPress={() => setShowPaymentModal(false)}
               >
-                 <Text style={styles.buttonText}>Cancel</Text> 
+                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.confirmButton}
                 onPress={confirmPayment}
               >
-              
                 <Text style={styles.buttonText}>Confirm</Text>
               </TouchableOpacity>
             </View>
@@ -481,22 +472,10 @@ const PickupTab = ({
       {/* Date Picker */}
       <View style={styles.dateContainer}>
         <Text style={styles.dateLabel}>Schedule Date:</Text>
-        <TouchableOpacity
-          style={styles.dateButton}
-          onPress={() => {
-            // Toggle between today and tomorrow
-            setScheduleDate((prev) =>
-              prev === moment().format('YYYY-MM-DD')
-                ? moment().add(1, 'days').format('YYYY-MM-DD')
-                : moment().format('YYYY-MM-DD')
-            );
-          }}
-        >
-          <Text style={styles.dateText}>
-            {moment(scheduleDate).format('MMM D, YYYY')}
-          </Text>
+        <View style={styles.dateButton}>
+          <Text style={styles.dateText}>{moment().format('MMM D, YYYY')}</Text>
           <MaterialIcons name="calendar-today" size={18} color="#1F818C" />
-        </TouchableOpacity>
+        </View>
       </View>
 
       {/* Time Slot Selector */}
@@ -549,7 +528,7 @@ const PickupTab = ({
         pendingParcels.map((parcel) => (
           <ParcelCard
             key={parcel._id}
-            parcel={parcel} 
+            parcel={parcel}
             isPickup={isPickupTab}
             refreshCounts={refreshCounts}
             navigation={navigation}
@@ -575,7 +554,7 @@ const HomeScreen = ({ navigation, route }) => {
   const [eveningParcels, setEveningParcels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
-   
+
   const insets = useSafeAreaInsets();
 
   const [unreadCount, setUnreadCount] = useState(0);
@@ -606,13 +585,13 @@ const HomeScreen = ({ navigation, route }) => {
         return {
           ...notification,
           message: `You have ${pickupCount} parcels to pickup`,
-          read: pickupCount === 0, // Mark as read if no pickups
+          read: pickupCount === 0, 
         };
       } else if (notification.id === 2) {
         return {
           ...notification,
           message: `You have ${deliveryCount} parcels to deliver`,
-          read: deliveryCount === 0, // Mark as read if no deliveries
+          read: deliveryCount === 0, 
         };
       }
       return notification;
@@ -620,7 +599,7 @@ const HomeScreen = ({ navigation, route }) => {
 
     setNotifications(newNotifications);
 
-    // Calculate unread count 
+    // Calculate unread count
     const unread = newNotifications.filter((n) => !n.read).length;
     setUnreadCount(unread);
   };
@@ -656,12 +635,12 @@ const HomeScreen = ({ navigation, route }) => {
       setEveningParcels(evening);
 
       // Calculate counts AFTER setting state
-      const pickupCount = 
-          morning.filter((p) => p.status === 'PendingPickup').length +
-          evening.filter((p) => p.status === 'PendingPickup').length;
-      const deliveryCount = 
-          morning.filter((p) => p.status === 'DeliveryDispatched').length +
-          evening.filter((p) => p.status === 'DeliveryDispatched').length;
+      const pickupCount =
+        morning.filter((p) => p.status === 'PendingPickup').length +
+        evening.filter((p) => p.status === 'PendingPickup').length;
+      const deliveryCount =
+        morning.filter((p) => p.status === 'DeliveryDispatched').length +
+        evening.filter((p) => p.status === 'DeliveryDispatched').length;
 
       setParcelCounts({
         pickup: pickupCount,
@@ -739,52 +718,53 @@ const HomeScreen = ({ navigation, route }) => {
       </View>
 
       {/* Notification Modal */}
-    
 
-        <Modal
-          visible={showNotifications}
-          animationType="slide"
-          statusBarTranslucent={true}
-          transparent={true}
-          onRequestClose={toggleNotifications}
-          onShow={() => {
-            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-            setUnreadCount(0);
-          }}
-        >
-          <View style={[styles.modalContainer]}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Parcel Summary</Text>
-                <TouchableOpacity onPress={toggleNotifications}>
-                  <MaterialIcons name="close" size={24} color="#1F818C" />
-                </TouchableOpacity>
-              </View>
+      <Modal
+        visible={showNotifications}
+        animationType="slide"
+        statusBarTranslucent={true}
+        transparent={true}
+        onRequestClose={toggleNotifications}
+        onShow={() => {
+          setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+          setUnreadCount(0);
+        }}
+      >
+        <View style={[styles.modalContainer]}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Parcel Summary</Text>
+              <TouchableOpacity onPress={toggleNotifications}>
+                <MaterialIcons name="close" size={24} color="#1F818C" />
+              </TouchableOpacity>
+            </View>
 
-              <View style={styles.notificationItem}>
-                <Text style={styles.notificationTitle}>
-                  <MaterialIcons name="local-shipping" size={18} color="#1F818C" />{' '}
-                  Parcels to Pick Up
-                </Text>
-                <Text style={styles.notificationMessage}>
-                  You have {parcelCounts.pickup} parcels waiting for pickup
-                </Text>
-              </View>
+            <View style={styles.notificationItem}>
+              <Text style={styles.notificationTitle}>
+                <MaterialIcons
+                  name="local-shipping"
+                  size={18}
+                  color="#1F818C"
+                />{' '}
+                Parcels to Pick Up
+              </Text>
+              <Text style={styles.notificationMessage}>
+                You have {parcelCounts.pickup} parcels waiting for pickup
+              </Text>
+            </View>
 
-              <View style={styles.notificationItem}>
-                <Text style={styles.notificationTitle}>
-                  <MaterialIcons name="check-circle" size={18} color="#4CAF50" />{' '}
-                  Parcels to Deliver
-                </Text>
-                <Text style={styles.notificationMessage}>
-                  You have {parcelCounts.delivery} parcels ready for delivery
-                </Text>
-              </View>
+            <View style={styles.notificationItem}>
+              <Text style={styles.notificationTitle}>
+                <MaterialIcons name="check-circle" size={18} color="#4CAF50" />{' '}
+                Parcels to Deliver
+              </Text>
+              <Text style={styles.notificationMessage}>
+                You have {parcelCounts.delivery} parcels ready for delivery
+              </Text>
             </View>
           </View>
-        </Modal>
-
-
+        </View>
+      </Modal>
 
       <Tab.Navigator
         initialRouteName="Pickup"

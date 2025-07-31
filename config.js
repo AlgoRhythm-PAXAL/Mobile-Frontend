@@ -1,3 +1,3 @@
-const API_BASE_URL = 'http://192.168.1.4:8000'; // Change this only once
+const API_BASE_URL = 'http://192.168.1.3:8000'; // Change this only once
 
 export default API_BASE_URL;

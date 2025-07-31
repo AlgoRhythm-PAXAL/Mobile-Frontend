@@ -94,22 +94,29 @@ const ParcelScreen = ({ navigation }) => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    const sourceData = tab === 'deliveries' ? completedParcels : completedPickups;
+    const sourceData =
+      tab === 'deliveries' ? completedParcels : completedPickups;
     setFilteredParcels(sourceData);
   };
 
   const applySearchPaymentFilter = () => {
     const query = searchQuery.toLowerCase();
-    const baseData = activeTab === 'pickups' ? completedPickups : completedParcels;
+    const baseData =
+      activeTab === 'pickups' ? completedPickups : completedParcels;
 
-    if (query === '' && paymentFilter === 'All' && !appliedStartDate && !appliedEndDate) {
+    if (
+      query === '' &&
+      paymentFilter === 'All' &&
+      !appliedStartDate &&
+      !appliedEndDate
+    ) {
       setFilteredParcels(baseData);
       return;
     }
 
-    let results = baseData.filter(parcel => {
+    let results = baseData.filter((parcel) => {
       const matchesQuery =
-        parcel.trackingNo?.toLowerCase().includes(query) ||
+        parcel.parcelId?.toLowerCase().includes(query) ||
         parcel.customerName?.toLowerCase().includes(query);
 
       const matchesPayment =
@@ -119,10 +126,46 @@ const ParcelScreen = ({ navigation }) => {
     });
 
     if (appliedStartDate || appliedEndDate) {
-      results = results.filter(parcel => {
-        const deliveredDate = new Date(parcel.deliveredAt);
-        const matchesStart = appliedStartDate ? deliveredDate >= new Date(appliedStartDate) : true;
-        const matchesEnd = appliedEndDate ? deliveredDate <= new Date(appliedEndDate) : true;
+      results = results.filter((parcel) => {
+        const deliveredDate = new Date(
+          activeTab === 'deliveries' ? parcel.deliveredAt : parcel.pickedUpAt
+        );
+        let matchesStart = true;
+        let matchesEnd = true;
+        if (appliedStartDate) {
+          const start = new Date(
+            appliedStartDate.getFullYear(),
+            appliedStartDate.getMonth(),
+            appliedStartDate.getDate()
+          );
+          const delivered = new Date(
+            deliveredDate.getFullYear(),
+            deliveredDate.getMonth(),
+            deliveredDate.getDate()
+          );
+          matchesStart = delivered >= start;
+        }
+        if (appliedEndDate) {
+          const end = new Date(
+            appliedEndDate.getFullYear(),
+            appliedEndDate.getMonth(),
+            appliedEndDate.getDate(),
+            23,
+            59,
+            59,
+            999
+          );
+          const delivered = new Date(
+            deliveredDate.getFullYear(),
+            deliveredDate.getMonth(),
+            deliveredDate.getDate(),
+            deliveredDate.getHours(),
+            deliveredDate.getMinutes(),
+            deliveredDate.getSeconds(),
+            deliveredDate.getMilliseconds()
+          );
+          matchesEnd = delivered <= end;
+        }
         return matchesStart && matchesEnd;
       });
     }
@@ -130,9 +173,20 @@ const ParcelScreen = ({ navigation }) => {
     setFilteredParcels(results);
   };
 
+  // Run filter when appliedStartDate or appliedEndDate changes
   useEffect(() => {
     applySearchPaymentFilter();
-  }, [searchQuery, paymentFilter, completedParcels, completedPickups, activeTab]);
+  }, [appliedStartDate, appliedEndDate]);
+
+  useEffect(() => {
+    applySearchPaymentFilter();
+  }, [
+    searchQuery,
+    paymentFilter,
+    completedParcels,
+    completedPickups,
+    activeTab,
+  ]);
 
   useEffect(() => {
     if (driverDetails?._id) {
@@ -209,7 +263,6 @@ const ParcelScreen = ({ navigation }) => {
               minute: '2-digit',
             })}
           </Text>
-
         </View>
       </View>
 
@@ -229,8 +282,17 @@ const ParcelScreen = ({ navigation }) => {
   }
 
   const generateCSV = (data) => {
-    const header = ['parcelId', 'TrackingNo', 'CustomerName', 'Address', 'Phone', 'DeliveredAt', 'PaymentMethod', 'Amount'];
-    const rows = data.map(p => [
+    const header = [
+      'parcelId',
+      'TrackingNo',
+      'CustomerName',
+      'Address',
+      'Phone',
+      'DeliveredAt',
+      'PaymentMethod',
+      'Amount',
+    ];
+    const rows = data.map((p) => [
       p.parcelId,
       p.trackingNo,
       p.customerName,
@@ -240,7 +302,7 @@ const ParcelScreen = ({ navigation }) => {
       p.payment.method,
       p.payment.amount,
     ]);
-    const csvString = [header, ...rows].map(e => e.join(',')).join('\n');
+    const csvString = [header, ...rows].map((e) => e.join(',')).join('\n');
     return csvString;
   };
 
@@ -253,7 +315,9 @@ const ParcelScreen = ({ navigation }) => {
     const fileName = `${FileSystem.documentDirectory}parcels_${Date.now()}.csv`;
 
     try {
-      await FileSystem.writeAsStringAsync(fileName, csv, { encoding: FileSystem.EncodingType.UTF8 });
+      await FileSystem.writeAsStringAsync(fileName, csv, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
       await Sharing.shareAsync(fileName);
     } catch (error) {
       Alert.alert('Error', 'Failed to export CSV file.');
@@ -274,7 +338,7 @@ const ParcelScreen = ({ navigation }) => {
             keyExtractor={(item) => item._id}
             renderItem={renderItem}
             scrollEnabled={true}
-            contentContainerStyle={{ paddingBottom: 80 }} 
+            contentContainerStyle={{ paddingBottom: 80 }}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -286,25 +350,43 @@ const ParcelScreen = ({ navigation }) => {
               <>
                 {/* Section Title */}
                 <Text style={styles.sectionTitle}>
-                  {activeTab === 'pickups' ? 'Completed Pickups' : 'Completed Deliveries'}
+                  {activeTab === 'pickups'
+                    ? 'Completed Pickups'
+                    : 'Completed Deliveries'}
                 </Text>
 
                 {/* Tabs */}
                 <View style={styles.tabSwitcher}>
                   <TouchableOpacity
                     onPress={() => handleTabChange('pickups')}
-                    style={[styles.tabButton, activeTab === 'pickups' && styles.tabButtonActive]}
+                    style={[
+                      styles.tabButton,
+                      activeTab === 'pickups' && styles.tabButtonActive,
+                    ]}
                   >
-                    <Text style={[styles.tabText, activeTab === 'pickups' && styles.tabTextActive]}>
+                    <Text
+                      style={[
+                        styles.tabText,
+                        activeTab === 'pickups' && styles.tabTextActive,
+                      ]}
+                    >
                       Pickups
                     </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     onPress={() => handleTabChange('deliveries')}
-                    style={[styles.tabButton, activeTab === 'deliveries' && styles.tabButtonActive]}
+                    style={[
+                      styles.tabButton,
+                      activeTab === 'deliveries' && styles.tabButtonActive,
+                    ]}
                   >
-                    <Text style={[styles.tabText, activeTab === 'deliveries' && styles.tabTextActive]}>
+                    <Text
+                      style={[
+                        styles.tabText,
+                        activeTab === 'deliveries' && styles.tabTextActive,
+                      ]}
+                    >
                       Deliveries
                     </Text>
                   </TouchableOpacity>
@@ -312,10 +394,15 @@ const ParcelScreen = ({ navigation }) => {
 
                 {/* Search Section */}
                 <View style={styles.searchContainer}>
-                  <MaterialIcons name="search" size={20} color="#888" style={styles.searchIcon} />
+                  <MaterialIcons
+                    name="search"
+                    size={20}
+                    color="#888"
+                    style={styles.searchIcon}
+                  />
                   <TextInput
                     style={styles.searchInput}
-                    placeholder="Search by tracking or customer"
+                    placeholder="Search by parcel Id or customer"
                     placeholderTextColor="#888"
                     value={searchQuery}
                     onChangeText={setSearchQuery}
@@ -334,39 +421,93 @@ const ParcelScreen = ({ navigation }) => {
                     <TouchableOpacity
                       key={label}
                       onPress={() => {
-                        const today = new Date();
+                        const now = new Date();
                         let start = null;
-                        let end = new Date();
-
+                        let end = null;
                         if (label === 'Today') {
-                          start = new Date(today.setHours(0, 0, 0, 0));
+                          start = new Date(
+                            now.getFullYear(),
+                            now.getMonth(),
+                            now.getDate()
+                          );
+                          end = new Date(
+                            now.getFullYear(),
+                            now.getMonth(),
+                            now.getDate(),
+                            23,
+                            59,
+                            59,
+                            999
+                          );
                         } else if (label === 'Yesterday') {
-                          start = new Date(today.setDate(today.getDate() - 1));
-                          start.setHours(0, 0, 0, 0);
-                          end = new Date(start);
-                          end.setHours(23, 59, 59, 999);
+                          const yest = new Date(
+                            now.getFullYear(),
+                            now.getMonth(),
+                            now.getDate() - 1
+                          );
+                          start = yest;
+                          end = new Date(
+                            yest.getFullYear(),
+                            yest.getMonth(),
+                            yest.getDate(),
+                            23,
+                            59,
+                            59,
+                            999
+                          );
                         } else if (label === 'Last 7 Days') {
-                          start = new Date(today.setDate(today.getDate() - 6));
-                          start.setHours(0, 0, 0, 0);
-                        } else if (label === 'All') {
-                          start = null;
-                          end = null;
+                          start = new Date(
+                            now.getFullYear(),
+                            now.getMonth(),
+                            now.getDate() - 6
+                          );
+                          end = new Date(
+                            now.getFullYear(),
+                            now.getMonth(),
+                            now.getDate(),
+                            23,
+                            59,
+                            59,
+                            999
+                          );
                         }
-
                         setStartDate(start);
                         setEndDate(end);
                         setAppliedStartDate(start);
                         setAppliedEndDate(end);
-                        applySearchPaymentFilter();
                       }}
                       style={[
                         styles.quickFilterButton,
                         (label === 'All' && !appliedStartDate) ||
-                        (label === 'Today' && appliedStartDate?.toDateString() === new Date().toDateString()) ||
-                        (label === 'Yesterday' && appliedStartDate?.toDateString() === new Date(new Date().setDate(new Date().getDate() - 1)).toDateString()) ||
-                        (label === 'Last 7 Days' && appliedStartDate?.toDateString() === new Date(new Date().setDate(new Date().getDate() - 6)).toDateString())
+                        (label === 'Today' &&
+                          appliedStartDate &&
+                          appliedEndDate &&
+                          appliedStartDate.toDateString() ===
+                            new Date().toDateString() &&
+                          appliedEndDate.toDateString() ===
+                            new Date().toDateString()) ||
+                        (label === 'Yesterday' &&
+                          appliedStartDate &&
+                          appliedEndDate &&
+                          appliedStartDate.toDateString() ===
+                            new Date(
+                              new Date().setDate(new Date().getDate() - 1)
+                            ).toDateString() &&
+                          appliedEndDate.toDateString() ===
+                            new Date(
+                              new Date().setDate(new Date().getDate() - 1)
+                            ).toDateString()) ||
+                        (label === 'Last 7 Days' &&
+                          appliedStartDate &&
+                          appliedEndDate &&
+                          appliedStartDate.toDateString() ===
+                            new Date(
+                              new Date().setDate(new Date().getDate() - 6)
+                            ).toDateString() &&
+                          appliedEndDate.toDateString() ===
+                            new Date().toDateString())
                           ? styles.quickFilterButtonActive
-                          : null
+                          : null,
                       ]}
                     >
                       <Text style={styles.quickFilterText}>{label}</Text>
@@ -380,7 +521,9 @@ const ParcelScreen = ({ navigation }) => {
                   style={styles.advancedToggle}
                 >
                   <Text style={styles.advancedToggleText}>
-                    {showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+                    {showAdvancedFilters
+                      ? 'Hide Advanced Filters'
+                      : 'Show Advanced Filters'}
                   </Text>
                   <MaterialIcons
                     name={showAdvancedFilters ? 'expand-less' : 'expand-more'}
@@ -408,9 +551,15 @@ const ParcelScreen = ({ navigation }) => {
                         style={styles.dateButton}
                       >
                         <Text style={styles.dateButtonText}>
-                          {startDate ? startDate.toLocaleDateString() : 'Start Date'}
+                          {startDate
+                            ? startDate.toLocaleDateString()
+                            : 'Start Date'}
                         </Text>
-                        <MaterialIcons name="calendar-today" size={18} color="#1F818C" />
+                        <MaterialIcons
+                          name="calendar-today"
+                          size={18}
+                          color="#1F818C"
+                        />
                       </TouchableOpacity>
 
                       <Text style={styles.dateSeparator}>to</Text>
@@ -422,7 +571,11 @@ const ParcelScreen = ({ navigation }) => {
                         <Text style={styles.dateButtonText}>
                           {endDate ? endDate.toLocaleDateString() : 'End Date'}
                         </Text>
-                        <MaterialIcons name="calendar-today" size={18} color="#1F818C" />
+                        <MaterialIcons
+                          name="calendar-today"
+                          size={18}
+                          color="#1F818C"
+                        />
                       </TouchableOpacity>
                     </View>
 
@@ -440,14 +593,18 @@ const ParcelScreen = ({ navigation }) => {
                 )}
 
                 {/* Export Button */}
-                <TouchableOpacity onPress={exportCSV} style={styles.exportButton}>
+                <TouchableOpacity
+                  onPress={exportCSV}
+                  style={styles.exportButton}
+                >
                   <MaterialIcons name="file-download" size={18} color="#fff" />
                   <Text style={styles.exportButtonText}>Export CSV</Text>
                 </TouchableOpacity>
 
                 {/* Results Count */}
                 <Text style={styles.resultsCount}>
-                  {filteredParcels.length} {filteredParcels.length === 1 ? 'Parcel' : 'Parcels'} Found
+                  {filteredParcels.length}{' '}
+                  {filteredParcels.length === 1 ? 'Parcel' : 'Parcels'} Found
                 </Text>
 
                 {/* Empty message */}
@@ -455,7 +612,9 @@ const ParcelScreen = ({ navigation }) => {
                   <View style={styles.emptyContainer}>
                     <MaterialIcons name="inbox" size={50} color="#ccc" />
                     <Text style={styles.emptyText}>
-                      {activeTab === 'pickups' ? 'No pickups found' : 'No deliveries found'}
+                      {activeTab === 'pickups'
+                        ? 'No pickups found'
+                        : 'No deliveries found'}
                     </Text>
                   </View>
                 )}
