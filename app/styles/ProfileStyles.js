@@ -1,0 +1,135 @@
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 100,
+    backgroundColor: '#F8FAFC',
+  },
+  scrollContainer: {
+    paddingBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 25,
+    backgroundColor: 'white',
+    marginBottom: 15,
+    borderRadius: 10,
+    margin: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 20,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#E0F2F1',
+  },
+  cameraIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#1F818C',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#2D3748',
+    marginBottom: 5,
+  },
+  userEmail: {
+    fontSize: 16,
+    color: '#718096',
+    marginBottom: 5,
+  },
+  userRole: {
+    fontSize: 14,
+    color: '#1F818C',
+    fontWeight: '600',
+  },
+  detailsCard: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginHorizontal: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  detailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EDF2F7',
+  },
+  detailIcon: {
+    marginRight: 15,
+    width: 24,
+    textAlign: 'center',
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: '#718096',
+    marginBottom: 3,
+  },
+  detailValue: {
+    fontSize: 16,
+    color: '#2D3748',
+    fontWeight: '500',
+  },
+  saveButton: {
+    backgroundColor: '#1F818C',
+    borderRadius: 10,
+    padding: 16,
+    marginHorizontal: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#1F818C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  saveButtonHighlight: {
+  backgroundColor: '#1F818C', // active blue
+},
+
+  saveButtonDisabled: {
+  backgroundColor: '#ccc', // grey when disabled
+},
+});
+
+export default styles;
